@@ -1,13 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:orientation="vertical" >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!" />
+    <com.gueg.recipes.MenuRow
+        android:id="@+id/activity_main_entrees"
+        android:layout_width="match_parent"
+        android:layout_height="132dp"
+
+        custom:row_menu_text="Entrées"
+        custom:row_menu_image="@drawable/menu_entree"
+
+        android:onClick="onClick"/>
+    <com.gueg.recipes.MenuRow
+        android:id="@+id/activity_main_plats"
+        android:layout_width="match_parent"
+        android:layout_height="132dp"
+
+        custom:row_menu_text="Plats"
+        custom:row_menu_image="@drawable/menu_plat"
+
+        android:onClick="onClick"/>
+    <com.gueg.recipes.MenuRow
+        android:id="@+id/activity_main_desserts"
+        android:layout_width="match_parent"
+        android:layout_height="132dp"
+
+        custom:row_menu_text="Desserts"
+        custom:row_menu_image="@drawable/menu_dessert"
+
+        android:onClick="onClick"/>
+    <com.gueg.recipes.MenuRow
+        android:id="@+id/activity_main_ajouter"
+        android:layout_width="match_parent"
+        android:layout_height="132dp"
+
+        custom:row_menu_text="Ajouter"
+        custom:row_menu_image="@drawable/menu_prepa"
+
+        android:onClick="onClick"/>
+
 
 </LinearLayout>

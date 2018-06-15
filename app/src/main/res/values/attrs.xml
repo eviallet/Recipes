@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="MenuRow">
+        <attr name="row_menu_text" format="string" />
+        <attr name="row_menu_image" format="reference" />
+    </declare-styleable>
+    <declare-styleable name="Tag">
+        <attr name="tag_text" format="string" />
+        <attr name="tag_bkg_color" format="color" />
+        <attr name="tag_text_color" format="color" />
+    </declare-styleable>
+</resources>
