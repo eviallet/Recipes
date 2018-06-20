@@ -10,8 +10,17 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+        <ImageView
+            android:id="@+id/row_recipe_image"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+
+            tools:ignore="ContentDescription"
+
+            android:layout_centerVertical="true"
+            android:layout_marginStart="5dp"/>
         <TextView
-            android:id="@+id/row_recipe_name"
+            android:id="@+id/row_recipe_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
@@ -20,11 +29,15 @@
             android:textStyle="bold"
             android:text="Title"
 
-            android:layout_marginStart="20dp"
-            android:layout_marginBottom="5dp"/>
+            android:layout_toEndOf="@id/row_recipe_image"
+            android:layout_marginStart="15dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="5dp"/>
 
 
 
+        <!--
         <ImageView
             android:id="@+id/row_recipe_clock"
             android:layout_width="20dp"
@@ -33,7 +46,8 @@
             android:src="@drawable/ic_clock"
             tools:ignore="ContentDescription"
 
-            android:layout_below="@id/row_recipe_name"
+            android:layout_below="@id/row_recipe_title"
+            android:layout_toEndOf="@id/row_recipe_image"
             android:layout_marginStart="5dp"
             android:layout_marginBottom="5dp" />
         <TextView
@@ -42,22 +56,27 @@
             android:layout_height="wrap_content"
 
             android:layout_toEndOf="@id/row_recipe_clock"
-            android:layout_below="@id/row_recipe_name"/>
+            android:layout_below="@id/row_recipe_title"
+            android:layout_marginStart="5dp"/>
+            -->
 
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
-            android:layout_below="@id/row_recipe_clock"
+            android:layout_toEndOf="@id/row_recipe_image"
+            android:layout_below="@id/row_recipe_title"
             android:layout_marginStart="5dp"
             android:layout_marginBottom="5dp">
-            <com.gueg.recipes.Tag
+            <!--
+            <com.gueg.recipes.views.Tag
                 android:layout_width="100dp"
                 android:layout_height="30dp"
 
                 app:tag_bkg_color="@android:color/holo_green_dark"
                 app:tag_text="Test"
                 app:tag_text_color="@android:color/white" />
+                -->
         </ScrollView>
 
 

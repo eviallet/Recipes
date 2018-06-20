@@ -1,4 +1,4 @@
-package com.gueg.recipes;
+package com.gueg.recipes.views;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -6,6 +6,8 @@ import android.util.AttributeSet;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.gueg.recipes.R;
 
 public class Tag extends RelativeLayout {
 
