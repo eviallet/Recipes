@@ -4,7 +4,7 @@ Android app that parse recipes from Marmiton.org
 
 <img src="recipes_menu.png" height="450" width="250"> <img src="recipes_search.png" height="450" width="250"> <img src="recipes_recipe.png" height="450" width="250">
 
-[This github](https://github.com/PaulLesur/marmiton-simple-API) really helped to understand how to use JSoup, even if I modified everything to parse informations through CSS.
+[This github](https://github.com/PaulLesur/marmiton-simple-API) really helped to understand how to use JSoup and as a base (even if I modified everything to parse informations through CSS).
 
 # TODO
 * SQL to save recipes on the long run
