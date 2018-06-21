@@ -27,6 +27,7 @@
             android:fontFamily="@font/octagen_roman"
             android:textSize="18sp"
             android:textStyle="bold"
+            android:maxLines="2"
             android:text="Title"
 
             android:layout_toEndOf="@id/row_recipe_image"
@@ -35,6 +36,99 @@
             android:layout_marginEnd="5dp"
             android:layout_marginTop="5dp"/>
 
+
+        <ImageView
+            android:id="@+id/row_recipe_star5"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+
+            android:src="@drawable/ic_star_border"
+            android:tint="@color/colorGold"
+
+            android:layout_below="@id/row_recipe_title"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="20dp"
+            android:layout_alignParentEnd="true"/>
+        <ImageView
+            android:id="@+id/row_recipe_star4"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+
+            android:src="@drawable/ic_star_border"
+            android:tint="@color/colorGold"
+
+            android:layout_below="@id/row_recipe_title"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="4dp"
+            android:layout_toStartOf="@id/row_recipe_star5"/>
+        <ImageView
+            android:id="@+id/row_recipe_star3"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+
+            android:src="@drawable/ic_star_border"
+            android:tint="@color/colorGold"
+
+            android:layout_below="@id/row_recipe_title"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="4dp"
+            android:layout_toStartOf="@id/row_recipe_star4"/>
+        <ImageView
+            android:id="@+id/row_recipe_star2"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+
+            android:src="@drawable/ic_star_border"
+            android:tint="@color/colorGold"
+
+            android:layout_below="@id/row_recipe_title"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="4dp"
+            android:layout_toStartOf="@id/row_recipe_star3"/>
+        <ImageView
+            android:id="@+id/row_recipe_star1"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+
+            android:src="@drawable/ic_star_border"
+            android:tint="@color/colorGold"
+
+            android:layout_below="@id/row_recipe_title"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="4dp"
+            android:layout_toStartOf="@id/row_recipe_star2"/>
+        <TextView
+            android:id="@+id/row_recipe_ppl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:textSize="15sp"
+            android:text="511"
+
+            android:layout_toStartOf="@id/row_recipe_star1"
+            android:layout_below="@id/row_recipe_title"
+            android:layout_marginStart="15dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="5dp"/>
+
+
+        <TextView
+            android:id="@+id/row_recipe_tags"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:fontFamily="@font/octagen_roman"
+            android:textSize="15sp"
+            android:text="Tags"
+
+            android:layout_toEndOf="@id/row_recipe_image"
+            android:layout_toStartOf="@id/row_recipe_ppl"
+            android:layout_below="@id/row_recipe_title"
+            android:layout_marginStart="15dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="5dp"/>
 
 
         <!--
@@ -59,7 +153,7 @@
             android:layout_below="@id/row_recipe_title"
             android:layout_marginStart="5dp"/>
             -->
-
+        <!--
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -68,7 +162,7 @@
             android:layout_below="@id/row_recipe_title"
             android:layout_marginStart="5dp"
             android:layout_marginBottom="5dp">
-            <!--
+
             <com.gueg.recipes.views.Tag
                 android:layout_width="100dp"
                 android:layout_height="30dp"
@@ -76,8 +170,9 @@
                 app:tag_bkg_color="@android:color/holo_green_dark"
                 app:tag_text="Test"
                 app:tag_text_color="@android:color/white" />
-                -->
+
         </ScrollView>
+            -->
 
 
     </RelativeLayout>

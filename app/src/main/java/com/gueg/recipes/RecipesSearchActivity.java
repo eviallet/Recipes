@@ -1,4 +1,4 @@
-package com.gueg.recipes.search;
+package com.gueg.recipes;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -14,9 +14,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.github.ybq.android.spinkit.SpinKitView;
-import com.gueg.recipes.R;
-import com.gueg.recipes.Recipe;
-import com.gueg.recipes.RecipeViewDialog;
 import com.gueg.recipes.tools.RecyclerItemClickListener;
 import com.gueg.recipes.tools.RecyclerViewAnimator;
 import com.gueg.recipes.tools.VerticalSpaceItemDecoration;
@@ -27,7 +24,7 @@ import java.util.concurrent.ExecutionException;
 
 public class RecipesSearchActivity extends AppCompatActivity {
     RecyclerView _searchRecyclerView;
-    RecipesSearchAdapter _searchAdapter;
+    RecipesAdapter _searchAdapter;
     EditText _search;
     SpinKitView _loading;
     ArrayList<Recipe> _recipes = new ArrayList<>();
@@ -43,8 +40,8 @@ public class RecipesSearchActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    searchFromBox();
                     hideKeyboard();
+                    searchFromBox();
                 }
                 return false;
             }
@@ -58,42 +55,38 @@ public class RecipesSearchActivity extends AppCompatActivity {
         _searchRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         _searchRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(15));
 
-        _searchAdapter = new RecipesSearchAdapter(_recipes);
+        _searchAdapter = new RecipesAdapter(this, _recipes);
 
 
-        _searchRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, _searchRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                RecipeViewDialog dialog = new RecipeViewDialog();
-                dialog.setRecipe(_recipes.get(position), false);
-                dialog.show(getSupportFragmentManager(), "com.gueg.recipes.recipessearchactivity.dialog");
-            }
+        _searchRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, _searchRecyclerView,
+                new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        RecipeViewDialog dialog = new RecipeViewDialog();
+                        dialog.setRecipe(_recipes.get(position), false);
+                        dialog.show(getSupportFragmentManager(), "com.gueg.recipes.recipessearchactivity.dialog");
+                    }
 
-            @Override
-            public void onLongItemClick(View view, int position) {
+                    @Override
+                    public void onLongItemClick(View view, int position) {
 
-            }
+                    }
         }));
 
         _searchRecyclerView.setAdapter(_searchAdapter);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    search(new String[]{new RandomRecipe().execute().get(), "6"});
-                } catch (InterruptedException|ExecutionException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+        try {
+            search(new String[]{new RandomRecipe().execute().get(), "6"});
+        } catch (InterruptedException|ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.activity_recipes_search_search_image:
-                searchFromBox();
                 hideKeyboard();
+                searchFromBox();
                 break;
             default:
                 break;
@@ -105,28 +98,34 @@ public class RecipesSearchActivity extends AppCompatActivity {
             search(new String[]{_search.getText().toString()});
     }
 
-    public synchronized void search(String[] txt) {
-        _recipes.clear();
-        runOnUiThread(new Runnable() {
+    public synchronized void search(final String[] txt) {
+        new Thread(new Runnable() {
             @Override
             public void run() {
-                _searchAdapter.notifyDataSetChanged();
-                showLoading();
-            }
-        });
-        try {
-            _recipes.addAll(new NetworkThread().execute(txt).get());
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    RecyclerViewAnimator.runAnimation(_searchRecyclerView);
-                    _searchAdapter.notifyDataSetChanged();
-                    hideLoading();
+                _recipes.clear();
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        _searchAdapter.notifyDataSetChanged();
+                        showLoading();
+                    }
+                });
+                try {
+                    _recipes.addAll(new NetworkThread().execute(txt).get());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            RecyclerViewAnimator.runAnimation(_searchRecyclerView);
+                            _searchAdapter.notifyDataSetChanged();
+                            hideLoading();
+                        }
+                    });
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
                 }
-            });
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
+            }
+        }).start();
     }
 
     private static class NetworkThread extends AsyncTask<String, Void, ArrayList<Recipe>> {

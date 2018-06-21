@@ -1,7 +1,6 @@
 package com.gueg.recipes;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -12,22 +11,32 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Recipe implements Serializable {
+
+    public static final int CATEGORY_ENTREE = 0;
+    public static final int CATEGORY_PLAT = 1;
+    public static final int CATEGORY_DESSERT = 2;
+
+    private int cat;
     private String name;
     private String urlLink;
     private String prepTime;
     private String cookingTime;
     private String imageUrl;
+    private String tag;
+    private int numReviews;
+    private int rating;
     private ArrayList<String> details;
     private ArrayList<Ingredient> ingredients;
     private int people;
 
 
-    public Recipe(String name, String urlLink, String imgLink) {
-
+    public Recipe(String name, String urlLink, String imgLink, int numReviews, int rating, String tag) {
         this.name = name;
         this.urlLink = urlLink;
         this.imageUrl = imgLink;
-
+        this.tag = tag;
+        this.rating = rating;
+        this.numReviews = numReviews;
     }
 
     public static class RecipeLoader extends AsyncTask<Recipe, Void, Recipe> {
@@ -42,6 +51,7 @@ public class Recipe implements Serializable {
             return null;
         }
     }
+
 
     private void loadInformations() throws IOException {
         Document page = Jsoup.connect(this.getUrlLink()).get();
@@ -86,6 +96,14 @@ public class Recipe implements Serializable {
 
     }
 
+    public void setCategory(int cat) {
+        this.cat = cat;
+    }
+
+    public int getCategory() {
+        return cat;
+    }
+
     public ArrayList<Ingredient> getIngredients() {
         return ingredients;
     }
@@ -118,7 +136,17 @@ public class Recipe implements Serializable {
         return people;
     }
 
+    public int getNumReviews() {
+        return numReviews;
+    }
 
+    public int getRating() {
+        return rating;
+    }
+
+    public String getTag() {
+        return tag;
+    }
 
     public static ArrayList<Recipe> search(String keyword, String limit) throws IOException {
         keyword = keyword.replaceAll(" ", "-");
@@ -141,18 +169,30 @@ public class Recipe implements Serializable {
 
             String imgLink = current.selectFirst("img").toString();
             imgLink = imgLink.substring(imgLink.indexOf("src=\"")+5, imgLink.indexOf("\" alt"));
-            Log.d(":-:",imgLink);
+
             String urlLink = current.toString().substring(current.toString().indexOf("href=\"")+6, current.toString().indexOf("\">"));
-            Log.d(":-:",urlLink);
+
             String title = current.selectFirst("h4.recipe-card__title").toString();
             title = title.substring(title.indexOf("\">")+2, title.indexOf("</"));
-            Log.d(":-:",title);
 
-            resultRecipes.add(new Recipe(title, urlLink, imgLink));
+            String tags = current.selectFirst("li.mrtn-tag.mrtn-tag--dark").toString();
+            tags = tags.substring(tags.indexOf("dark\">")+6, tags.indexOf("</"));
+
+            String numReviewsString = current.selectFirst("span.mrtn-font-discret").toString();
+            numReviewsString = numReviewsString.substring(numReviewsString.indexOf("sur ")+4, numReviewsString.indexOf("avis")-1).replace(" ","");
+            if (numReviewsString.length()<1)
+                numReviewsString = "0";
+
+            String ratingString = current.selectFirst("span.recipe-card__rating__value").toString();
+            ratingString = ratingString.substring(ratingString.indexOf("value\">")+7, ratingString.indexOf("</s")).replace(" ","");
+            if (ratingString.length()<1)
+                ratingString = "0";
+
+            resultRecipes.add(new Recipe(title, urlLink, imgLink, Integer.decode(numReviewsString), Integer.decode(ratingString), tags));
         }
         return resultRecipes;
     }
-    
+
 
     private ArrayList<Ingredient> extractIngredients(String ingredientsString){
 
