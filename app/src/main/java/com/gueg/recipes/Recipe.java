@@ -16,6 +16,7 @@ public class Recipe implements Serializable {
     public static final int CATEGORY_PLAT = 1;
     public static final int CATEGORY_DESSERT = 2;
 
+    private int id;
     private int cat;
     private String name;
     private String urlLink;
@@ -98,6 +99,14 @@ public class Recipe implements Serializable {
 
     public void setCategory(int cat) {
         this.cat = cat;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public int getCategory() {

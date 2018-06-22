@@ -9,6 +9,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,8 +18,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListPopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.gueg.recipes.sql.SQLUtility;
+import com.gueg.recipes.tools.RecyclerItemClickListener;
 import com.gueg.recipes.tools.VerticalSpaceItemDecoration;
 import com.plattysoft.leonids.ParticleSystem;
 
@@ -86,6 +88,19 @@ public class RecipeViewDialog extends DialogFragment {
         _people = rootView.findViewById(R.id.dialog_recipe_view_details_people);
 
         _ingredientsView = rootView.findViewById(R.id.dialog_recipe_view_ingredients_recyclerview);
+        _ingredientsView.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), _ingredientsView, new RecyclerItemClickListener.OnItemClickListener() {
+            @Override public void onItemClick(View view, int position) {}
+            @Override
+            public void onLongItemClick(View view, int position) {
+                LocalBroadcastManager.getInstance(getActivity()).
+                        sendBroadcast(
+                                new Intent().
+                                        setAction(MainActivity.SHOPPING_KEY).
+                                        putExtra(MainActivity.SHOPPING_ITEM, _r.getIngredients().get(position)));
+                showCustomToast();
+
+            }
+        }));
         _stepsView = rootView.findViewById(R.id.dialog_recipe_view_steps_recyclerview);
 
         _fav = rootView.findViewById(R.id.dialog_recipe_view_favorite);
@@ -112,7 +127,7 @@ public class RecipeViewDialog extends DialogFragment {
                         _menu.dismiss();
                         return;
                 }
-                LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(new Intent().setAction(SQLUtility.SQL_ADDED).putExtra(SQLUtility.SQL_RECIPE, _r));
+                //LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(new Intent().setAction(SQLUtility.SQL_ADDED).putExtra(SQLUtility.SQL_RECIPE, _r));
                 new ParticleSystem(getActivity(), 60, R.drawable.particle_circle_green, 500)
                         .setSpeedRange(0.05f, 0.15f).setStartTime(250).setFadeOut(250)
                         .oneShot(_fav, 60);
@@ -167,7 +182,7 @@ public class RecipeViewDialog extends DialogFragment {
                                     if (_state) {
                                         _menu.show();
                                     } else {
-                                        LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(new Intent().setAction(SQLUtility.SQL_REMOVED).putExtra(SQLUtility.SQL_RECIPE, _r));
+                                        //LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(new Intent().setAction(SQLUtility.SQL_REMOVED).putExtra(SQLUtility.SQL_RECIPE, _r));
                                         _fav.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_border));
                                     }
                                 }
@@ -245,5 +260,16 @@ public class RecipeViewDialog extends DialogFragment {
             getDialog().setDismissMessage(null);
         }
         super.onDestroyView();
+    }
+
+    private void showCustomToast() {
+        Toast toast = new Toast(getContext());
+        toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+        toast.setDuration(Toast.LENGTH_SHORT);
+        toast.setView(
+                getLayoutInflater().inflate(
+                        R.layout.custom_toast,
+                        (ViewGroup) rootView.findViewById(R.id.custom_toast_container)));
+        toast.show();
     }
 }

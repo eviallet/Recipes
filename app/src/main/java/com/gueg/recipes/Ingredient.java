@@ -7,17 +7,26 @@ public class Ingredient implements Serializable {
     private String name;
     private String quantity;
     private String imageUrl;
-
-    public Ingredient(String name, String quantity){
-        this(name,quantity,"");
-    }
+    private int shoppingQuantity;
 
     public Ingredient(String name, String quantity, String imageUrl){
         this.name = name;
         this.quantity = quantity;
         this.imageUrl = imageUrl;
+        shoppingQuantity = 0;
     }
 
+    public void addShoppingQuantity() {
+        shoppingQuantity++;
+    }
+
+    public void dimShoppingQuantity() {
+        shoppingQuantity--;
+    }
+
+    public int getShoppingQuantity() {
+        return shoppingQuantity;
+    }
 
     public String getName() {
         return name;

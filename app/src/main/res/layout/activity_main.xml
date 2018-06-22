@@ -1,48 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<android.support.v4.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:custom="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:fitsSystemWindows="true"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
-
-    <com.gueg.recipes.views.MenuRow
-        android:id="@+id/activity_main_entrees"
+    android:layout_height="match_parent">
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="132dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
 
-        custom:row_menu_text="Entrées"
-        custom:row_menu_image="@drawable/menu_entree"
+        <com.gueg.recipes.views.MenuRow
+            android:id="@+id/activity_main_entrees"
+            android:layout_width="match_parent"
+            android:layout_height="132dp"
 
-        android:onClick="onClick"/>
-    <com.gueg.recipes.views.MenuRow
-        android:id="@+id/activity_main_plats"
-        android:layout_width="match_parent"
-        android:layout_height="132dp"
+            custom:row_menu_text="Entrées"
+            custom:row_menu_image="@drawable/menu_entree"
 
-        custom:row_menu_text="Plats"
-        custom:row_menu_image="@drawable/menu_plat"
+            android:onClick="onClick"/>
+        <com.gueg.recipes.views.MenuRow
+            android:id="@+id/activity_main_plats"
+            android:layout_width="match_parent"
+            android:layout_height="132dp"
 
-        android:onClick="onClick"/>
-    <com.gueg.recipes.views.MenuRow
-        android:id="@+id/activity_main_desserts"
-        android:layout_width="match_parent"
-        android:layout_height="132dp"
+            custom:row_menu_text="Plats"
+            custom:row_menu_image="@drawable/menu_plat"
 
-        custom:row_menu_text="Desserts"
-        custom:row_menu_image="@drawable/menu_dessert"
+            android:onClick="onClick"/>
+        <com.gueg.recipes.views.MenuRow
+            android:id="@+id/activity_main_desserts"
+            android:layout_width="match_parent"
+            android:layout_height="132dp"
 
-        android:onClick="onClick"/>
-    <com.gueg.recipes.views.MenuRow
-        android:id="@+id/activity_main_ajouter"
-        android:layout_width="match_parent"
-        android:layout_height="132dp"
+            custom:row_menu_text="Desserts"
+            custom:row_menu_image="@drawable/menu_dessert"
 
-        custom:row_menu_text="Ajouter"
-        custom:row_menu_image="@drawable/menu_prepa"
+            android:onClick="onClick"/>
+        <com.gueg.recipes.views.MenuRow
+            android:id="@+id/activity_main_ajouter"
+            android:layout_width="match_parent"
+            android:layout_height="132dp"
 
-        android:onClick="onClick"/>
+            custom:row_menu_text="Ajouter"
+            custom:row_menu_image="@drawable/menu_prepa"
 
+            android:onClick="onClick"/>
+    </LinearLayout>
 
-</LinearLayout>
+    <android.support.design.widget.NavigationView
+        android:id="@+id/navigation_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:layout_marginTop="?attr/actionBarSize" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            android:orientation="vertical">
+            <com.gueg.recipes.views.MenuRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                custom:row_menu_image="@drawable/menu_shopping"
+                custom:row_menu_text="shopping" />
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/activity_main_drawer_recyclerview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </LinearLayout>
+    </android.support.design.widget.NavigationView>
+</android.support.v4.widget.DrawerLayout>

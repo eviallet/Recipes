@@ -1,6 +1,7 @@
 package com.gueg.recipes;
 
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -59,6 +60,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.ViewHold
     }
 
     // Replace the contents of a view (invoked by the layout manager)
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull final RecipesAdapter.ViewHolder holder, final int position) {
         holder._title.setText(_list.get(position).getName());
@@ -88,7 +90,5 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.ViewHold
     public int getItemCount() {
         return _list.size();
     }
-
-
 
 }
