@@ -1,46 +1,75 @@
 package com.gueg.recipes;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.TypeConverters;
+import android.content.Context;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
+
+import com.gueg.recipes.recipes_database.Converters;
+import com.gueg.recipes.recipes_database.RecipeDatabase;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
-public class Recipe implements Serializable {
+@Entity
+@TypeConverters(Converters.class)
+public class Recipe {
 
     public static final int CATEGORY_ENTREE = 0;
     public static final int CATEGORY_PLAT = 1;
     public static final int CATEGORY_DESSERT = 2;
 
-    private int id;
-    private int cat;
+    public static final String PARAM_NONE = "com.gueg.recipes.recipessearchactivity.none";
+    public static final String PARAM_LIMIT = "com.gueg.recipes.recipessearchactivity.limit";
+    public static final String PARAM_CURPOS = "com.gueg.recipes.recipessearchactivity.curpos";
+
     private String name;
-    private String urlLink;
+    @PrimaryKey @NonNull
+    private String url;
     private String prepTime;
     private String cookingTime;
     private String imageUrl;
     private String tag;
     private int numReviews;
     private int rating;
+    private int cat;
+    private int people;
     private ArrayList<String> details;
     private ArrayList<Ingredient> ingredients;
-    private int people;
 
 
-    public Recipe(String name, String urlLink, String imgLink, int numReviews, int rating, String tag) {
+    public Recipe(String name, @NonNull String url, String imgLink, int numReviews, int rating, String tag) {
         this.name = name;
-        this.urlLink = urlLink;
+        this.url = url;
         this.imageUrl = imgLink;
         this.tag = tag;
         this.rating = rating;
         this.numReviews = numReviews;
     }
 
-    public static class RecipeLoader extends AsyncTask<Recipe, Void, Recipe> {
+    public Recipe(String name, @NonNull String url, String prepTime, String cookingTime, String imageUrl, String tag, int numReviews, int rating, int cat, int people, ArrayList<String> details, ArrayList<Ingredient> ingredients) {
+        this.name = name;
+        this.url = url;
+        this.prepTime = prepTime;
+        this.cookingTime = cookingTime;
+        this.imageUrl = imageUrl;
+        this.tag = tag;
+        this.numReviews = numReviews;
+        this.rating = rating;
+        this.cat = cat;
+        this.people = people;
+        this.details = details;
+        this.ingredients = ingredients;
+    }
+
+    private static class RecipeLoader extends AsyncTask<Recipe, Void, Recipe> {
         @Override
         protected Recipe doInBackground(Recipe... recipes) {
             try {
@@ -53,9 +82,19 @@ public class Recipe implements Serializable {
         }
     }
 
+    public static void loadRecipe(Context c, Recipe r) {
+        if(RecipeDatabase.getDatabase(c).recipeDao().findByUrl(r.getUrl())==null) {
+            try {
+                new RecipeLoader().execute(r).get();
+            } catch (ExecutionException|InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     private void loadInformations() throws IOException {
-        Document page = Jsoup.connect(this.getUrlLink()).get();
+        Document page = Jsoup.connect(getUrl()).get();
 
         String nameString = page.selectFirst("h1.main-title").toString();
         name = nameString.substring(nameString.indexOf(">")+1, nameString.indexOf("</"));
@@ -101,15 +140,7 @@ public class Recipe implements Serializable {
         this.cat = cat;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public int getCategory() {
+    public int getCat() {
         return cat;
     }
 
@@ -125,8 +156,8 @@ public class Recipe implements Serializable {
         return name;
     }
 
-    public String getUrlLink() {
-        return urlLink;
+    public String getUrl() {
+        return url;
     }
 
     public String getPrepTime() {
@@ -157,18 +188,21 @@ public class Recipe implements Serializable {
         return tag;
     }
 
-    public static ArrayList<Recipe> search(String keyword, String limit) throws IOException {
+    public static ArrayList<Recipe> search(String keyword, String paramDef, int param) throws IOException {
         keyword = keyword.replaceAll(" ", "-");
 
         ArrayList<Recipe> resultRecipes = new ArrayList<>();
 
-        Document document = Jsoup.connect("http://www.marmiton.org/recettes/recherche.aspx?aqt=" + keyword).get();
+        String pageString = "";
+        if(paramDef.equals(PARAM_CURPOS))
+            pageString = "&start="+Integer.toString(param);
+        Document document = Jsoup.connect("http://www.marmiton.org/recettes/recherche.aspx?aqt=" + keyword + pageString).get();
 
         Element elementResultsList = document.selectFirst("div.recipe-search__resuts");
 
         int lim = 0;
-        if(limit!=null)
-            lim = Integer.decode(limit);
+        if(paramDef.equals(PARAM_LIMIT))
+            lim = param;
 
         if(lim==0||lim>elementResultsList.select("a.recipe-card").size())
             lim = elementResultsList.select("a.recipe-card").size();
@@ -269,7 +303,7 @@ public class Recipe implements Serializable {
     public String toString() {
         return "Recipe{" +
                 "name='" + name + '\'' +
-                ", urlLink='" + urlLink + '\'' +
+                ", url='" + url + '\'' +
                 ", prepTime='" + prepTime + '\'' +
                 ", cookingTime='" + cookingTime + '\'' +
                 ", details='" + details + '\'' +

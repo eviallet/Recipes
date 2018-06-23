@@ -1,9 +1,15 @@
 package com.gueg.recipes;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 
+@Entity
 public class Ingredient implements Serializable {
 
+    @PrimaryKey @NonNull
     private String name;
     private String quantity;
     private String imageUrl;
@@ -13,7 +19,7 @@ public class Ingredient implements Serializable {
         this.name = name;
         this.quantity = quantity;
         this.imageUrl = imageUrl;
-        shoppingQuantity = 0;
+        shoppingQuantity = 1;
     }
 
     public void addShoppingQuantity() {
@@ -38,6 +44,10 @@ public class Ingredient implements Serializable {
 
     public String getImageUrl() {
         return imageUrl;
+    }
+
+    public void setShoppingQuantity(int shoppingQuantity) {
+        this.shoppingQuantity = shoppingQuantity;
     }
 
     @Override

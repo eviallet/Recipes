@@ -5,11 +5,11 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:padding="8dp"
-    android:background="@color/colorGreen"
+    android:layout_margin="3dp"
 
     app:cardElevation="2dp"
-    app:cardBackgroundColor="@color/colorAccent"
-    app:cardCornerRadius="7dp">
+    app:cardBackgroundColor="@color/colorToast"
+    app:cardCornerRadius="1dp">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -19,11 +19,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+
+            android:tint="@color/colorWhite"
             />
         <TextView android:id="@+id/text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/colorBlack"
+            android:textColor="@color/colorWhite"
             android:fontFamily="@font/octagen_roman"
 
             android:layout_gravity="center"

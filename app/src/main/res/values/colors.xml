@@ -10,4 +10,5 @@
 
     <color name="colorRed">#b71c1c</color>
     <color name="colorGreen">#388e3c</color>
+    <color name="colorToast">#336e9e</color>
 </resources>

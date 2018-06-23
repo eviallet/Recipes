@@ -9,7 +9,6 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,12 +19,12 @@ import android.widget.ListPopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gueg.recipes.recipes_database.RecipeDatabase;
 import com.gueg.recipes.tools.RecyclerItemClickListener;
 import com.gueg.recipes.tools.VerticalSpaceItemDecoration;
 import com.plattysoft.leonids.ParticleSystem;
 
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 
 import fr.tvbarthel.lib.blurdialogfragment.BlurDialogEngine;
 
@@ -41,6 +40,8 @@ public class RecipeViewDialog extends DialogFragment {
     TextView _cook;
     TextView _people;
     ImageView _fav;
+
+    RecipeUpdate _listener;
 
     RecyclerView _ingredientsView;
     IngredientsAdapter _ingredientsAdapter;
@@ -113,21 +114,15 @@ public class RecipeViewDialog extends DialogFragment {
         _menu.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                switch(position) {
-                    case 0:
-                        _r.setCategory(Recipe.CATEGORY_ENTREE);
-                        break;
-                    case 1:
-                        _r.setCategory(Recipe.CATEGORY_PLAT);
-                        break;
-                    case 2:
-                        _r.setCategory(Recipe.CATEGORY_DESSERT);
-                        break;
-                    default:
-                        _menu.dismiss();
-                        return;
-                }
-                //LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(new Intent().setAction(SQLUtility.SQL_ADDED).putExtra(SQLUtility.SQL_RECIPE, _r));
+                if(position>=0&&position<=2)
+                    _r.setCategory(position);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        RecipeDatabase.getDatabase(getContext()).recipeDao().insertAll(_r);
+                    }
+                }).start();
+
                 new ParticleSystem(getActivity(), 60, R.drawable.particle_circle_green, 500)
                         .setSpeedRange(0.05f, 0.15f).setStartTime(250).setFadeOut(250)
                         .oneShot(_fav, 60);
@@ -146,86 +141,68 @@ public class RecipeViewDialog extends DialogFragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    _r = new Recipe.RecipeLoader().execute(_r).get();
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            rootView.findViewById(R.id.dialog_recipe_view_loading).setVisibility(View.GONE);
-                            rootView.findViewById(R.id.dialog_recipe_view_container).setVisibility(View.VISIBLE);
+                Recipe.loadRecipe(getActivity(), _r);
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        rootView.findViewById(R.id.dialog_recipe_view_loading).setVisibility(View.GONE);
+                        rootView.findViewById(R.id.dialog_recipe_view_container).setVisibility(View.VISIBLE);
 
-                            _people.setText(Integer.toString(_r.getPeople()));
+                        _people.setText(Integer.toString(_r.getPeople()));
 
-                            _prep.setText(_r.getPrepTime());
-                            _cook.setText(_r.getCookingTime());
-
-
-                            _ingredientsView.setHasFixedSize(true);
-                            _ingredientsView.setLayoutManager(new LinearLayoutManager(getContext()));
-                            _ingredientsView.addItemDecoration(new VerticalSpaceItemDecoration(5));
-                            _ingredientsAdapter = new IngredientsAdapter(_r.getIngredients());
-                            _ingredientsView.setAdapter(_ingredientsAdapter);
-
-                            _stepsView.setHasFixedSize(true);
-                            _stepsView.setLayoutManager(new LinearLayoutManager(getContext()));
-                            _stepsView.addItemDecoration(new VerticalSpaceItemDecoration(15));
-                            _stepsAdapter = new StepsAdapter(_r.getDetails(), _r.getDetails().size());
-                            _stepsView.setAdapter(_stepsAdapter);
+                        _prep.setText(_r.getPrepTime());
+                        _cook.setText(_r.getCookingTime());
 
 
-                            _fav.setOnClickListener(new View.OnClickListener() {
-                                private boolean _state = false;
+                        _ingredientsView.setHasFixedSize(true);
+                        _ingredientsView.setLayoutManager(new LinearLayoutManager(getContext()));
+                        _ingredientsView.addItemDecoration(new VerticalSpaceItemDecoration(5));
+                        _ingredientsAdapter = new IngredientsAdapter(_r.getIngredients());
+                        _ingredientsView.setAdapter(_ingredientsAdapter);
 
-                                @Override
-                                public void onClick(View view) {
+                        _stepsView.setHasFixedSize(true);
+                        _stepsView.setLayoutManager(new LinearLayoutManager(getContext()));
+                        _stepsView.addItemDecoration(new VerticalSpaceItemDecoration(15));
+                        _stepsAdapter = new StepsAdapter(_r.getDetails(), _r.getDetails().size());
+                        _stepsView.setAdapter(_stepsAdapter);
+
+
+                        _fav.setOnClickListener(new View.OnClickListener() {
+                            private boolean _state = false;
+                            private boolean _modifRegistered = false;
+
+                            @Override
+                            public void onClick(View view) {
+                                if(_modif && !_modifRegistered) {
+                                    _fav.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite));
+                                    _state = true;
+                                    _modifRegistered = true;
+                                } else {
                                     _state = !_state;
                                     if (_state) {
                                         _menu.show();
                                     } else {
-                                        //LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(new Intent().setAction(SQLUtility.SQL_REMOVED).putExtra(SQLUtility.SQL_RECIPE, _r));
+                                        new Thread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                RecipeDatabase.getDatabase(getContext()).recipeDao().delete(_r);
+                                                if(_modif)
+                                                    _listener.onRecipeRemoved();
+                                            }
+                                        }).start();
                                         _fav.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_border));
                                     }
                                 }
-                            });
-                        }
-                    });
-                } catch(InterruptedException|ExecutionException e) {
-                    e.printStackTrace();
-                }
+                            }
+                        });
+
+                        if(_modif)
+                            _fav.callOnClick();
+                    }
+                });
             }
         }).start();
 
-
-        /*
-        if(modif) {
-            Button remove = rootView.findViewById(R.id.btn_bookmarkActivity_remove);
-            remove.setVisibility(View.VISIBLE);
-            remove.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    _listener.onBookmarkRemoved();
-                    dismiss();
-                }
-            });
-        }
-
-        rootView.findViewById(R.id.btn_bookmarkActivity_annuler).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss();
-            }
-        });
-        rootView.findViewById(R.id.btn_bookmarkActivity_valider).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(!title.getText().toString().isEmpty()&&!url.getText().toString().isEmpty()) {
-                    _listener.onBookmarkAdded(new Bookmark(title.getText().toString(),url.getText().toString(),b.getPic()));
-                    dismiss();
-                } else
-                    Toast.makeText(getActivity(), "Entrer un titre et une url", Toast.LENGTH_SHORT).show();
-            }
-        });
-        */
 
         return rootView;
     }
@@ -233,6 +210,10 @@ public class RecipeViewDialog extends DialogFragment {
     public void setRecipe(Recipe r, boolean modif) {
         _r = r;
         _modif = modif;
+    }
+
+    public void setListener(RecipeUpdate listener) {
+        _listener = listener;
     }
 
     @Override
@@ -264,12 +245,15 @@ public class RecipeViewDialog extends DialogFragment {
 
     private void showCustomToast() {
         Toast toast = new Toast(getContext());
-        toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
         toast.setDuration(Toast.LENGTH_SHORT);
         toast.setView(
                 getLayoutInflater().inflate(
                         R.layout.custom_toast,
                         (ViewGroup) rootView.findViewById(R.id.custom_toast_container)));
         toast.show();
+    }
+
+    public interface RecipeUpdate{
+        void onRecipeRemoved();
     }
 }

@@ -28,6 +28,8 @@ public class RecipesSearchActivity extends AppCompatActivity {
     EditText _search;
     SpinKitView _loading;
     ArrayList<Recipe> _recipes = new ArrayList<>();
+    String _currentSearchTerm = "";
+    String _lastpos = "0";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -75,11 +77,7 @@ public class RecipesSearchActivity extends AppCompatActivity {
 
         _searchRecyclerView.setAdapter(_searchAdapter);
 
-        try {
-            search(new String[]{new RandomRecipe().execute().get(), "6"});
-        } catch (InterruptedException|ExecutionException e) {
-            e.printStackTrace();
-        }
+        randomSearch();
     }
 
     public void onClick(View v) {
@@ -88,17 +86,53 @@ public class RecipesSearchActivity extends AppCompatActivity {
                 hideKeyboard();
                 searchFromBox();
                 break;
+            case R.id.activity_recipes_search_next:
+                hideKeyboard();
+                loadNextPage();
+                break;
+            case R.id.activity_recipes_search_random:
+                hideKeyboard();
+                randomSearch();
+                break;
             default:
                 break;
         }
     }
 
-    public void searchFromBox() {
-        if(!_search.getText().toString().isEmpty())
-            search(new String[]{_search.getText().toString()});
+
+
+
+    private void randomSearch() {
+        try {
+            search(new String[]{
+                    (_currentSearchTerm = new RandomRecipe().execute().get()),
+                    Recipe.PARAM_LIMIT,
+                    (_lastpos="6")
+            });
+        } catch (InterruptedException|ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
-    public synchronized void search(final String[] txt) {
+    public void searchFromBox() {
+        if(!_search.getText().toString().isEmpty()) {
+            _currentSearchTerm = _search.getText().toString();
+            search(new String[]{
+                    _currentSearchTerm,
+                    Recipe.PARAM_NONE
+            });
+        }
+    }
+
+    private void loadNextPage() {
+        search(new String[]{
+                _currentSearchTerm,
+                Recipe.PARAM_CURPOS,
+                _lastpos
+        });
+    }
+
+    public synchronized void search(final String[] params) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -112,13 +146,17 @@ public class RecipesSearchActivity extends AppCompatActivity {
                     }
                 });
                 try {
-                    _recipes.addAll(new NetworkThread().execute(txt).get());
+                    _recipes.addAll(new NetworkThread().execute(params).get());
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             RecyclerViewAnimator.runAnimation(_searchRecyclerView);
                             _searchAdapter.notifyDataSetChanged();
                             hideLoading();
+                            if(params[1].equals(Recipe.PARAM_CURPOS))
+                                _lastpos = Integer.toString(Integer.decode(_lastpos)+_recipes.size());
+                            else
+                                _lastpos = Integer.toString(_recipes.size());
                         }
                     });
                 } catch (InterruptedException | ExecutionException e) {
@@ -128,21 +166,40 @@ public class RecipesSearchActivity extends AppCompatActivity {
         }).start();
     }
 
+
+
+
     private static class NetworkThread extends AsyncTask<String, Void, ArrayList<Recipe>> {
 
         @Override
         protected ArrayList<Recipe> doInBackground(String... strs) {
             try {
-                if(strs.length>1)
-                    return Recipe.search(strs[0], strs[1]);
-                else
-                    return Recipe.search(strs[0], null);
+                int param = -1;
+                if(!strs[1].equals(Recipe.PARAM_NONE))
+                    param = Integer.decode(strs[2]);
+                return Recipe.search(strs[0], strs[1], param);
             } catch (IOException e) {
                 e.printStackTrace();
             }
             return null;
         }
     }
+
+    private static class RandomRecipe extends AsyncTask<Void, Void, String> {
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            try {
+                return Recipe.getRandomRecipe();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
+
+
+
 
     private void showLoading() {
         _loading.animate().alpha(0).scaleX(0.5f).scaleY(0.5f).setDuration(0).withEndAction(new Runnable() {
@@ -162,20 +219,6 @@ public class RecipesSearchActivity extends AppCompatActivity {
             }
         }).start();
     }
-
-    private static class RandomRecipe extends AsyncTask<Void, Void, String> {
-
-        @Override
-        protected String doInBackground(Void... voids) {
-            try {
-                return Recipe.getRandomRecipe();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-    }
-
 
     private void hideKeyboard() {
         View view = getCurrentFocus();
