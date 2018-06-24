@@ -5,15 +5,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.gueg.recipes.recipes_database.RecipeDatabase;
 import com.gueg.recipes.shopping_database.ShoppingDatabase;
@@ -132,10 +134,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (startIntentData != null) {
             String intentUrl = startIntentData.toString();
             if (intentUrl.contains("http://www.recipe.com")) {
-                Log.d(":-:","Launched from intent");
-                addRecipesFromIntent(intentUrl);
+                if(isOnline())
+                    addRecipesFromIntent(intentUrl);
+                else
+                    Toast.makeText(this, "Connexion internet requise.", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
     private void addRecipesFromIntent(String list) {
@@ -193,7 +204,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(intentDesserts);
                 break;
             case R.id.activity_main_ajouter:
-                startActivity(new Intent(MainActivity.this, RecipesSearchActivity.class));
+                if(isOnline())
+                    startActivity(new Intent(MainActivity.this, RecipesSearchActivity.class));
+                else
+                    Toast.makeText(this, "Pas de connexion internet.", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.activity_main_add_button:
                 if(_ingredientText.getText().toString().isEmpty())
