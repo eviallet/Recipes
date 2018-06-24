@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -83,14 +84,37 @@ public class RecipesSearchActivity extends AppCompatActivity {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.activity_recipes_search_search_image:
+                findViewById(R.id.activity_recipes_search_search_image).animate().scaleX(0.8f).scaleY(0.8f).setDuration(150).withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        findViewById(R.id.activity_recipes_search_search_image).animate().scaleX(1f).scaleY(1f).setDuration(250).start();
+                    }
+                }).start();
                 hideKeyboard();
                 searchFromBox();
                 break;
             case R.id.activity_recipes_search_next:
+                findViewById(R.id.activity_recipes_search_next).animate().translationX(200f).alpha(0.2f).setDuration(500).setInterpolator(new AccelerateDecelerateInterpolator()).withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        findViewById(R.id.activity_recipes_search_next).animate().translationX(-75f).alpha(0.7f).setDuration(0).withEndAction(new Runnable() {
+                            @Override
+                            public void run() {
+                                findViewById(R.id.activity_recipes_search_next).animate().translationX(0).alpha(1).setInterpolator(new AccelerateDecelerateInterpolator()).setDuration(600).start();
+                            }
+                        }).start();
+                    }
+                }).start();
                 hideKeyboard();
                 loadNextPage();
                 break;
             case R.id.activity_recipes_search_random:
+                findViewById(R.id.activity_recipes_search_random).animate().rotationBy(-20f).setDuration(250).withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        findViewById(R.id.activity_recipes_search_random).animate().rotationBy(200f).setDuration(500).start();
+                    }
+                }).start();
                 hideKeyboard();
                 randomSearch();
                 break;

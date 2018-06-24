@@ -127,9 +127,9 @@ public class RecipeViewDialog extends DialogFragment {
                     }
                 }).start();
 
-                new ParticleSystem(getActivity(), 60, R.drawable.particle_circle_green, 500)
-                        .setSpeedRange(0.05f, 0.15f).setStartTime(250).setFadeOut(250)
-                        .oneShot(_fav, 60);
+                new ParticleSystem(getActivity(), 30, R.drawable.particle_circle_green, 300)
+                        .setSpeedRange(0.05f, 0.15f)
+                        .oneShot(_fav, 30);
                 _fav.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite));
                 _menu.dismiss();
             }

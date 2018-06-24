@@ -199,22 +199,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if(_ingredientText.getText().toString().isEmpty())
                     return;
                 final Ingredient ing = new Ingredient(_ingredientText.getText().toString(), "", "");
-                if(ShoppingDatabase.getDatabase(getApplicationContext()).shoppingDao().findByTitle(ing.getName())==null) {
-                    _ingredientText.setText("");
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (ShoppingDatabase.getDatabase(getApplicationContext()).shoppingDao().findByTitle(ing.getName()) == null) {
                             ShoppingDatabase.getDatabase(getApplicationContext()).shoppingDao().insertAll(ing);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
+                                    _ingredientText.setText("");
                                     _shoppingListItems.add(ing);
                                     _shoppingAdapter.notifyDataSetChanged();
                                 }
                             });
                         }
-                    }).start();
-                }
+                    }
+                }).start();
                 break;
         }
     }
