@@ -2,10 +2,15 @@
 Android app that parse recipes from Marmiton.org
 
 
-<img src="recipes_menu.png" height="450" width="250"> <img src="recipes_searchactivity.png" height="450" width="250"> <img src="recipes_recipe.png" height="450" width="250"> <img src="recipes_shopping.png" height="450" width="250">
+<img src="recipes_menu.png" height="400" width="210"> <img src="recipes_searchactivity.png" height="400" width="210"> <img src="recipes_recipe.png" height="400" width="210"> <img src="recipes_shopping.png" height="400" width="210">
 
 [This github](https://github.com/PaulLesur/marmiton-simple-API) really helped to understand how to use JSoup and as a base.
 
-# TODO
-* SQL to save recipes on the long run
-* Sort/filter by tags/ingredients
+# Working
+* Parsing recipes and details from marmiton.org
+* Saving recipes on categorized databases
+* Shopping list (long click an item or add it manually on drawer)
+* Sharing recipes (http://www.recipe.com/&recipe1link&recipe2link) and categorizing on the fly
+
+# Known bugs
+* Rating not loaded when sharing
