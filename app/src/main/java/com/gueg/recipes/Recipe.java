@@ -1,6 +1,7 @@
 package com.gueg.recipes;
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
@@ -45,6 +46,13 @@ public class Recipe {
     private ArrayList<Ingredient> ingredients;
 
 
+    @Ignore
+    public Recipe(@NonNull String url) {
+        this.url = url;
+        this.cat = CATEGORY_PLAT;
+    }
+
+    @Ignore
     public Recipe(String name, @NonNull String url, String imgLink, int numReviews, int rating, String tag) {
         this.name = name;
         this.url = url;
@@ -285,7 +293,7 @@ public class Recipe {
                 str = str.substring(str.indexOf("</h3> ") + 6);
                 while (str.contains("href"))
                     str = new StringBuilder(str).delete(str.indexOf("<"), str.indexOf(">") + 1).toString();
-                str = str.replace("</a>", "");
+                str = str.replace("</a>", "").replace("<br>","");
                 results.add(str);
             }
         }

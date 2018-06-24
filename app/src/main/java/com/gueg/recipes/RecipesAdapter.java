@@ -68,20 +68,30 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.ViewHold
         holder._ppl.setText(Integer.toString(_list.get(position).getNumReviews()));
         holder._tags.setText(_list.get(position).getTag());
 
-        switch (_list.get(position).getRating()) {
-            case 5:
-                holder._star5.setImageDrawable(c.getDrawable(R.drawable.ic_star));
-            case 4:
-                holder._star4.setImageDrawable(c.getDrawable(R.drawable.ic_star));
-            case 3:
-                holder._star3.setImageDrawable(c.getDrawable(R.drawable.ic_star));
-            case 2:
-                holder._star2.setImageDrawable(c.getDrawable(R.drawable.ic_star));
-            case 1:
-                holder._star1.setImageDrawable(c.getDrawable(R.drawable.ic_star));
-                break;
-            default:
-                break;
+        if(_list.get(position).getNumReviews()>0) {
+
+            switch (_list.get(position).getRating()) {
+                case 5:
+                    holder._star5.setImageDrawable(c.getDrawable(R.drawable.ic_star));
+                case 4:
+                    holder._star4.setImageDrawable(c.getDrawable(R.drawable.ic_star));
+                case 3:
+                    holder._star3.setImageDrawable(c.getDrawable(R.drawable.ic_star));
+                case 2:
+                    holder._star2.setImageDrawable(c.getDrawable(R.drawable.ic_star));
+                case 1:
+                    holder._star1.setImageDrawable(c.getDrawable(R.drawable.ic_star));
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            holder._star1.setVisibility(View.INVISIBLE);
+            holder._star2.setVisibility(View.INVISIBLE);
+            holder._star3.setVisibility(View.INVISIBLE);
+            holder._star4.setVisibility(View.INVISIBLE);
+            holder._star5.setVisibility(View.INVISIBLE);
+            holder._ppl.setVisibility(View.INVISIBLE);
         }
     }
 

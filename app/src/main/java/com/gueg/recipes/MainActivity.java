@@ -5,11 +5,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
@@ -48,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder().cacheInMemory(true).cacheOnDisk(true).build();
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext()).defaultDisplayImageOptions(defaultOptions).build();
         ImageLoader.getInstance().init(config);
+
 
         _ingredientText = findViewById(R.id.activity_main_add_user_text);
 
@@ -123,6 +126,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         loadShoppingFromDatabase();
+
+
+        Uri startIntentData = getIntent().getData();
+        if (startIntentData != null) {
+            String intentUrl = startIntentData.toString();
+            if (intentUrl.contains("http://www.recipe.com")) {
+                Log.d(":-:","Launched from intent");
+                addRecipesFromIntent(intentUrl);
+            }
+        }
+    }
+
+    private void addRecipesFromIntent(String list) {
+        String[] recipes = list.split("&");
+
+        RecipeIntentDialog dialog = new RecipeIntentDialog();
+        dialog.setRecipes(recipes);
+        dialog.setListener(new RecipeIntentDialog.RecipeUpdate() {
+            @Override
+            public void onRecipesLoaded(final Recipe[] recipes) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        RecipeDatabase.getDatabase(getApplicationContext()).recipeDao().insertAll(recipes);
+                    }
+                }).start();
+            }
+        });
+        dialog.show(getSupportFragmentManager(), "com.gueg.recipes.mainactivity.dialog");
     }
 
     private void loadShoppingFromDatabase() {

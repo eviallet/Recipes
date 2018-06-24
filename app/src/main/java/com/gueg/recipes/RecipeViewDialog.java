@@ -7,8 +7,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -72,6 +74,8 @@ public class RecipeViewDialog extends DialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.dialog_recipe_view, container, false);
         super.onCreateView(inflater, container, savedInstanceState);
+
+        Log.d(":-:","Preparing blur");
 
         mBlurEngine = new BlurDialogEngine(Objects.requireNonNull(getActivity()));
         mBlurEngine.setBlurRadius(8);
@@ -138,6 +142,8 @@ public class RecipeViewDialog extends DialogFragment {
             }
         });
 
+        Log.d(":-:","Dialog layout inflated");
+
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -179,25 +185,27 @@ public class RecipeViewDialog extends DialogFragment {
                                     _modifRegistered = true;
                                 } else {
                                     _state = !_state;
-                                    if (_state) {
+                                    if (_state)
                                         _menu.show();
-                                    } else {
-                                        new Thread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                RecipeDatabase.getDatabase(getContext()).recipeDao().delete(_r);
-                                                if(_modif)
-                                                    _listener.onRecipeRemoved();
-                                            }
-                                        }).start();
-                                        _fav.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_border));
-                                    }
+                                    else
+                                        deleteRecipe();
                                 }
                             }
                         });
 
                         if(_modif)
                             _fav.callOnClick();
+
+                        rootView.findViewById(R.id.dialog_recipe_view_share).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Intent i=new Intent(android.content.Intent.ACTION_SEND);
+                                i.setType("text/plain");
+                                i.putExtra(android.content.Intent.EXTRA_SUBJECT,"Partager");
+                                i.putExtra(android.content.Intent.EXTRA_TEXT, "http://www.recipe.com/&"+_r.getUrl());
+                                startActivity(Intent.createChooser(i,"Partager avec"));
+                            }
+                        });
                     }
                 });
             }
@@ -205,6 +213,49 @@ public class RecipeViewDialog extends DialogFragment {
 
 
         return rootView;
+    }
+
+    private void deleteRecipe() {
+        if(_modif) {
+            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which) {
+                        case DialogInterface.BUTTON_POSITIVE:
+                            dialog.dismiss();
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    RecipeDatabase.getDatabase(getContext()).recipeDao().delete(_r);
+                                    if(_modif)
+                                        _listener.onRecipeRemoved();
+                                }
+                            }).start();
+                            _fav.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_border));
+                            break;
+
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            dialog.dismiss();
+                            break;
+                    }
+                }
+            };
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
+            builder.setMessage("Supprimer la recette ?").setPositiveButton("Oui", dialogClickListener)
+                    .setNegativeButton("Non", dialogClickListener).show();
+        }
+        else {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    RecipeDatabase.getDatabase(getContext()).recipeDao().delete(_r);
+                    if(_modif)
+                        _listener.onRecipeRemoved();
+                }
+            }).start();
+            _fav.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_border));
+        }
     }
 
     public void setRecipe(Recipe r, boolean modif) {

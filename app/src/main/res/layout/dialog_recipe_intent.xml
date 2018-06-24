@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/dialog_recipe_intent_title_card"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+
+        app:cardBackgroundColor="@color/colorPrimary"
+        app:cardElevation="5dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/dialog_recipe_view_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:fontFamily="@font/octagen_roman"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorBlack"
+                android:text="Charger des recettes"
+                android:maxLines="1"
+
+                android:layout_marginStart="5dp"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/dialog_recipe_view_favorite"/>
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+
+    <LinearLayout
+        android:id="@+id/dialog_recipe_intent_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_alignParentBottom="true"
+        android:gravity="end"
+        android:weightSum="15">
+        <Button
+            android:id="@+id/dialog_recipe_intent_annuler"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="Annuler"
+            android:textColor="@color/colorWhite"
+            android:backgroundTint="@color/colorRed"
+
+            android:layout_weight="1"/>
+        <Button
+            android:id="@+id/dialog_recipe_intent_ok"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="Valider"
+            android:textColor="@color/colorWhite"
+            android:backgroundTint="@color/colorGreen"
+
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/dialog_recipe_intent_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/dialog_recipe_intent_buttons"
+        android:layout_below="@id/dialog_recipe_intent_title_card"
+
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"/>
+
+</RelativeLayout>
